@@ -95,6 +95,9 @@ PASSWORD = getpass.getpass("Senha do Moodle: ")
 os.system("cls" if os.name == "nt" else "clear")
 
 
+print(sys.argv[1].upper(),sys.argv[2].upper())
+
+
 class Disciplina:
     def __init__(self, codigo=None, nome_curto=None, id='0', num_atividades=0, situacao=False):
         self.codigo = codigo

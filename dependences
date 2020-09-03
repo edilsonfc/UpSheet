@@ -3,3 +3,4 @@ pip install bs4
 pip install gspread
 pip install csv
 pip install html5lib
+pip install configparser
