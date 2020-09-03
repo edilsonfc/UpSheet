@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "imposing-union-283420",
+  "private_key_id": "a50de38fc9933ab28cd2ce9e47ecf7bc83a74e0a",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC3oxyhjxFEoaN8\nlLhDY7JOelDuJVBCmtRuXUIIqoh6ElTqk2YJpcNlu6r0Zu1c30QVNSIrTJjYv217\n/NfXFBeApY/DCq5Av3+n41Sli8FaYjAwji4BAhfwxcxk+k6jjSP652jaM9l84Clh\nRxQQXg7aN0R3rTeCckIbLNEt0Z2TFptbpQeOvuQbHeZh9QNFpGYkKtBwP92s+uRt\nCDLFG+LdDXhsKJ314ljaMpzbF64e3VzbK5t+KbduifnW/CGzCSbOz0VHsrH1mftA\nISblsve5OG8CN2AvRINJwzAEuww2E076UeR+MxFITwCQSC5k584F6Cq6d1WhfkqJ\nFAUBc6stAgMBAAECggEAWQ3rBpZBA413oSTmLxgcEl7S/Ipv370CI/tp2JYK1Vgq\ngg+1Phx7I8zc3OVFWvKTK822olTlEsfSqnw1mAIQW7zueOGnG5NCrwJZvGaH//L5\n97IbsTV4srTZqGaS2FHMDxNGD/txD1QN/TThEAbtIPoIZBlGgCY01MTpNFUhG4Da\nCsuMIPxp9d5Bmm2j7QpvTn2uFs+ASwVkDaXmfg4tW6yNunEmwEMQj3m9ZS+UVDIs\nAP7z6emQoKz2x+475la0DYi2FFVHBe6h0qZU020E63eMuRgj4SoNlkrQ1H86oYrq\nG0Fi1nPioudhFP2L0JDfvBsASUscqTMbvKPkNoIh6QKBgQDsIFEDDe7EQdX1TwL+\nxNWLXBuuaEQqaEU4QBxOki+MFRoOVIyUzmmdWJfKvOnL3LXLfWlij0IWFa9Ox7c9\nYnBEJJU+1QIQCJOTLDIh2eBvUGi8amQzHBZXf25bTrlm9Hfj52xUTpoC+iNI0XEJ\nGrBOyekVdxFZT1zijrnDA2vSWwKBgQDHF9d7Vyo39nhbEhTgUK9wFEQxmvjKp9HC\nYegi/r0DZfCZm6NOyQWKhz2ijfDZD8JdYwTUMSb8TQAtEv+WzmSz6ZzD02bnRMLw\n3xvK/RVOEnWUAvbBMYw61YY/HxLftluswHu8z6yzdMUEqqI8GbRs+WBuXSmnrX2g\nfjKe9VxfFwKBgBiGdsOhc9ZQnD+BeGcr3J4/7+QaklHxSJdCGW6TwnqDSpSIdZ2T\nHucn54Q4QPRatUsweHyzMoMGt5GwLrkie1SolBPVngQ6T9GuenqHnccSC/7d8hBY\n730hED5Nm/Y0mCtEwzyyeU6r2nRaxKnUatGUKTCAkH29P4GMn4DA3zcXAoGBAJTN\nFvpSfXVyOyYl74BwDY+BNi61GvmsUDQuJOfy6KYfjKHiFz6NNB0DU2epGrfA9Y4C\nsds+GVs82cLWjjzSaaWmFsqtuB1l4SVSO12NplzBoytKw85FD//xEvMecGbPztjg\nzBqkRPmjbpU8SyEMPTOtdwtFihqOqnRHneH8lFtlAoGBAIrNWH09PkGgkFuaoPIO\n7IMFpLcGIux6cV826nXftPiuwXFOD7y0uy2RfEJaUziUMS6zV6Yx9BvPvHrzAHTp\nGTt4EoI90KChutteVdQ/aWqanh1VspQB+LU3VeHrlxtL99M99A56b8dNb+7QiXbN\n74sQFzzd6d2P/HcOvaHc8Xkl\n-----END PRIVATE KEY-----\n",
+  "client_email": "edilson@imposing-union-283420.iam.gserviceaccount.com",
+  "client_id": "100148449092862652442",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/edilson%40imposing-union-283420.iam.gserviceaccount.com"
+}
