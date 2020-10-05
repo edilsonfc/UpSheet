@@ -95,6 +95,7 @@ USERNAME = ''
 PASSWORD = ''
 baseurl = "https://moodle.utfpr.edu.br/"
 LOGUE = []
+
 #CONFIGS
 LOG_FILENAME = "logfile.log"
 for handler in logging.root.handlers[:]:
@@ -103,7 +104,7 @@ logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
 sections = itertools.count()
 files = itertools.count()
 scope = ['https://spreadsheets.google.com/feeds']
-# KEYs = '1Fkvo3rhYFfbuL712rHyyaA3XWhkkX4_YctDSK4_BIlc'
+
 credentials = ServiceAccountCredentials.from_json_keyfile_name('credenciais.json', scope)
 gc = gspread.authorize(credentials)
 wks = gc.open_by_key(KEYs)
@@ -111,11 +112,7 @@ worksheet = wks.get_worksheet(0)
 
 print()
 print('-------- LOGIN _------------------------------')
-# os.system("cls" if os.name == "nt" else "clear")
 USERNAME = input("Nome de usuario do moodle: ")
-#USUARIO = getpass.getuser("Nome de usuario do moodle: ")
-# os.system("cls" if os.name == "nt" else "clear")
-#SENHA = input("Senha do Moodle: ")
 PASSWORD = getpass.getpass("Senha do Moodle: ")
 os.system("cls" if os.name == "nt" else "clear")
 
@@ -229,23 +226,13 @@ class Script:
             # OBTER DADOS NO MOODLE
             self.log('-----' + disciplina.nome_completo + '-------')
             self.update_curso(disciplina)
-            disciplina.ATIVIDADES = self.obter_atividades_disciplina_moolde(disciplina)
-            notas_alunos = self.obter_notas_alunos(disciplina)
-            notas_alunos = self.atividades_para_corrigir2(disciplina, notas_alunos)
-
-
-            # csv_file = self.get_page_curso(disciplina)
-            # leitor = self.get_csv(csv_file)
-            # # SE PLANILHA NÃO EXISTE, CRIAR
-            #planilha = self.get_planilha(disciplina)
-            # # ATUALIZAR PLANILHA
-            # resposta = self.obter_dados_csv(disciplina, leitor)
-            # nomes = resposta[1]
-            # notas_alunos = resposta[0]
-
-            self.atualiza_planilha(disciplina, notas_alunos)
-            # escreve_notas_alunos(disciplina, notas_alunos)
-            print()
+            if self.verificar_acesso(disciplina):
+                disciplina.ATIVIDADES = self.obter_atividades_disciplina_moolde(disciplina)
+                notas_alunos = self.obter_notas_alunos(disciplina)
+                notas_alunos = self.atividades_para_corrigir2(disciplina, notas_alunos)
+                self.atualiza_planilha(disciplina, notas_alunos)
+                # escreve_notas_alunos(disciplina, notas_alunos)
+                print()
         self.log('FINALIZADO')
 
     def log(self, texto):
@@ -366,10 +353,24 @@ class Script:
 
         return alunos_ativos
 
+    def verificar_acesso(self, disciplina):
+        self.log(f'VERIFICANDO ACESSO NA DISCIPLINA {disciplina.codigo}')
+        url = baseurl + '/enrol/index.php?id=' + disciplina.id
+        try:
+            r = self.session.get(url)
+            time.sleep(1)
+            soup = bs(r.content, 'html5lib')
+            soup.find('div', attrs={'class': 'course-content'}).find_all('div')
+            self.log(f'ACESSO PERMITIDO NA DISCIPLINA {disciplina.codigo}')
+            print()
+            return True
+        except:
+            self.log(f'ACESSO NÃO PERMITIDO NA DISCIPLINA {disciplina.codigo}')
+            return False
+
     def update_curso(self, disciplina):
         self.log('OBTENDO ID DA DISCIPLINA')
         url_search = baseurl + 'course/search.php?q=' + disciplina.codigo
-
         try:
             r = self.session.get(url_search)
             time.sleep(1)
@@ -598,7 +599,6 @@ class Script:
             ]
         }
         wks.batch_update(body)
-
 
     def barrar_alunos_inativos(self, disciplina, planilha):
         self.log('BARRAR ALUNOS INATIVOS')
