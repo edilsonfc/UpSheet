@@ -11,60 +11,83 @@ import datetime
 import getpass
 import logging
 
-# for a in range(len(sys.argv)):
-#     print(sys.argv[a])
-
-if len(sys.argv) <= 2:
-    print('sem argumentos')
-    print('utilize argumentos da seguinte forma:')
-    print('')
-    print('python UpdateSheet.py CURSO TURMA')
-    print('')
-    print('Opções de curso:')
-    print('- Java VIII ou Java IX')
-    print('- MBA III ou MBA IV')
-    sys.exit()
-
-
-KEY_JAVA_VIII = '1qvlHVHBPZEAtquBi8Gh1Wnc82-C-kAButZ8bmqihT-k'
-KEY_JAVA_IX = '1Fkvo3rhYFfbuL712rHyyaA3XWhkkX4_YctDSK4_BIlc'
+#JAVA
+KEY_JAVA_XVIII = '1qvlHVHBPZEAtquBi8Gh1Wnc82-C-kAButZ8bmqihT-k'
+KEY_JAVA_XIX = '1Fkvo3rhYFfbuL712rHyyaA3XWhkkX4_YctDSK4_BIlc'
+KEY_JAVA_XX = '1qE6i4r5oieIPbAUOcuAKEcfXp-Y93RRjuU4uqe7sMjk'
+#MBA
 KEY_MBA_III = '1mGRcIdVWR6OtppHgxCxFRrdGWH0Kn9IUN86wpHP_WGQ'
 KEY_MBA_IV = '15DxfzavHF6HRZzmA8Dcg0CiMnB6IvBZKWmfP5u7rJow'
-#PLANILHA PADRÃO
-KEYs = KEY_JAVA_IX
+#REDES
 
-try:
+#PLANILHA PADRÃO
+KEYs = ''
+#KEYs = KEY_JAVA_XIX
+
+curso = ''
+turma = ''
+
+#VERIFICA SE FORAM PASSADOS CURSO E TURMA POR ARGUMENTO
+if len(sys.argv) > 2:
     print(sys.argv[0], sys.argv[1].upper(),sys.argv[2].upper())
     curso = sys.argv[1]
     turma = sys.argv[2]
+else:
+    print()
+    print('-------- AJUDA -------------------------------')
+    print('Você pode usar argumentos')
+    print('Exemplo: python UpdateSheet.py CURSO TURMA')
+    print('----------------------------------------------')
+    print()
+    print('-------- CURSOS ------------------------------')
+    print('Opções de curso:')
+    print('- JAVA XVIII, Java XIX, java XX')
+    print('- MBA III ou MBA IV')
+    print('- REDES em breve')
+    print('----------------------------------------------')
+    print()
+    print('-------- CURSO _------------------------------')
+    print('(JAVA, REDES OU MBA)')
+    print()
+    curso = input('Digite o curso: ')
+    print('----------------------------------------------')
+    print()
+    print('-------- TURMA _------------------------------')
+    print('JAVA: XVIII, XIX ou XX')
+    print('MBA: III, IV')
+    print('REDES: não disponível')
+    print()
+    turma = input('Digite a turma: ')
+    print('----------------------------------------------')
 
-    if 'java'.upper() == curso.upper():
-        if turma.upper() in 'ix'.upper():
-            KEYs = KEY_JAVA_IX
-        else:
-            if turma.upper() == 'viii'.upper():
-                KEYs = KEY_JAVA_VIII
-            else:
-                print('argumento invalido')
-                print('turmas possíveis para Java: IX e VIII')
-                sys.exit()
-    else:
-        if 'mba'.upper() == curso.upper():
-            if turma.upper() == 'iii'.upper():
-                KEYs = KEY_MBA_III
-            else:
-                if turma.upper() == 'iv'.upper():
-                    KEYs = KEY_MBA_IV
-                else:
-                    print('argumento invalido')
-                    print('turmas possíveis para MBA: III e IV')
-                    sys.exit()
-        else:
-            print('Argumentos inválidos')
-            print('cursos possíveis: Java e MBA')
+if curso.upper() == 'JAVA':
+    if turma.upper() == 'XVIII':
+        KEYs = KEY_JAVA_XVIII
+    if turma.upper() == 'XIX':
+        KEYs = KEY_JAVA_XIX
+    if turma.upper() == 'XX':
+        KEYs = KEY_JAVA_XX
+    if KEYs == '':
+        print('!TURMA INCORRETA')
+        time.sleep(5)
+        sys.exit()
+if curso.upper() == 'MBA':
+    if turma.upper() == 'III':
+        KEYs = KEY_MBA_III
+    if turma.upper() == 'IV':
+        KEYs = KEY_MBA_IV
+    if KEYs == '':
+        print('!TURMA INCORRETA')
+        time.sleep(5)
+        sys.exit()
+if curso.upper() == 'REDES':
+    print('!NÃO IMPLEMENTADO')
+    time.sleep(5)
+    sys.exit()
+if KEYs == '':
+    print('!CURSO INCORRETO')
+    time.sleep(5)
 
-except:
-    print('Argumentos inválidos')
 
 
 
@@ -86,6 +109,8 @@ gc = gspread.authorize(credentials)
 wks = gc.open_by_key(KEYs)
 worksheet = wks.get_worksheet(0)
 
+print()
+print('-------- LOGIN _------------------------------')
 # os.system("cls" if os.name == "nt" else "clear")
 USERNAME = input("Nome de usuario do moodle: ")
 #USUARIO = getpass.getuser("Nome de usuario do moodle: ")
@@ -94,17 +119,20 @@ USERNAME = input("Nome de usuario do moodle: ")
 PASSWORD = getpass.getpass("Senha do Moodle: ")
 os.system("cls" if os.name == "nt" else "clear")
 
-
-print(sys.argv[1].upper(),sys.argv[2].upper())
-
+print()
+print(curso.upper(),turma.upper())
+print()
+print('https://docs.google.com/spreadsheets/d/'+KEYs)
+print()
 
 class Disciplina:
-    def __init__(self, codigo=None, nome_curto=None, id='0', num_atividades=0, situacao=False):
+    def __init__(self, codigo=None, nome_curto=None, id='0', num_atividades=0, tutor = "", situacao=False):
         self.codigo = codigo
         self.nome_curto = nome_curto
         self.id = id
         self.nome_completo = codigo + " - " + nome_curto
         self.num_atividades = num_atividades
+        self.tutor = tutor
         if situacao == 'FALSE':
             self.situacao = False
         else:
@@ -113,6 +141,10 @@ class Disciplina:
         self.professor = "nome professor"
         self.email_professor = "professor@email"
         self.ATIVIDADES = []
+
+
+    def is_tutoria_por_disciplina(self):
+        return not self.tutor == ""
 
     def get_url_curso(self):
         return baseurl + "course/view.php?id="+ str(self.id)
@@ -199,6 +231,8 @@ class Script:
             self.update_curso(disciplina)
             disciplina.ATIVIDADES = self.obter_atividades_disciplina_moolde(disciplina)
             notas_alunos = self.obter_notas_alunos(disciplina)
+            notas_alunos = self.atividades_para_corrigir2(disciplina, notas_alunos)
+
 
             # csv_file = self.get_page_curso(disciplina)
             # leitor = self.get_csv(csv_file)
@@ -269,7 +303,7 @@ class Script:
         disciplinas = []
         dados = wks.worksheet("CONF").get_all_records()
         for disc in dados:
-            d = Disciplina(disc["COD"], disc["NOME"], disc["ID"], disc["ATIVIDADES"], disc["ATIVO"])
+            d = Disciplina(disc["COD"], disc["NOME"], disc["ID"], 0, disc["TUTOR"], disc["ATIVO"])
             disciplinas.append(d)
             self.log(d.__str__())
         return disciplinas
@@ -335,10 +369,15 @@ class Script:
     def update_curso(self, disciplina):
         self.log('OBTENDO ID DA DISCIPLINA')
         url_search = baseurl + 'course/search.php?q=' + disciplina.codigo
-        print(url_search)
-        r = self.session.get(url_search)
-        time.sleep(1)
-        soup = bs(r.content, 'html5lib')
+
+        try:
+            r = self.session.get(url_search)
+            time.sleep(1)
+            soup = bs(r.content, 'html5lib')
+        except:
+            self.log(f'NÃO FOI POSSÍVEL OBTER OS DADOS DA DISCIPLINA {disciplina.codigo}')
+            self.session = self.login(USERNAME, PASSWORD)
+            self.update_curso(disciplina)
         try:
             nome_completo = soup.find('h3', attrs={'class': 'coursename'})
             a = nome_completo.find_all('a')[0]
@@ -560,6 +599,7 @@ class Script:
         }
         wks.batch_update(body)
 
+
     def barrar_alunos_inativos(self, disciplina, planilha):
         self.log('BARRAR ALUNOS INATIVOS')
         # barra alunos inativos
@@ -639,15 +679,10 @@ class Script:
 
         intervalo = self.get_intervalo_tabela(tabela, 8, 2)
 
-        # for l in tabela:
-        #
-        #     print(l)
-        # print(tabela)
-
         planilha.update(intervalo, tabela, value_input_option='USER_ENTERED')
         planilha.format(intervalo, {"horizontalAlignment": "CENTER"})
 
-        self.atividades_para_corrigir(disciplina, planilha)
+        #self.atividades_para_corrigir(disciplina, planilha)
 
         self.planilha_atualizada(disciplina)
 
@@ -757,6 +792,8 @@ class Script:
                     th = tr.find_all('th')[0].contents[0]
                     td = tr.find_all('td')[0].contents[0]
                     if 'Precisa de avaliação' in th:
+                        if td == '':
+                            td = 0
                         atividade.precisa_avaliacao = td
                     if 'Data de entrega' in th:
                         atividade.data_entrega = td
@@ -814,11 +851,38 @@ class Script:
                         # cell1 = planilha.find(aluno.nome_planilha)
                         cell2 = planilha.find(atividade.get_nome_curto())
                         link_atividade = baseurl +'mod/assign/view.php?id='+atividade.id+'&rownum=0&action=grader&userid='+aluno.id
-                        planilha.update_cell(int(aluno.linha) + 4, cell2.col, '=HYPERLINK("'+link_atividade+'";"'+aluno.get_tutor()+'")')
+
+                        if disciplina.is_tutoria_por_disciplina():
+                            nome_tutor = disciplina.tutor
+                        else:
+                            nome_tutor = aluno.get_tutor()
+
+                        planilha.update_cell(int(aluno.linha) + 4, cell2.col, '=HYPERLINK("'+link_atividade+'";"'+nome_tutor+'")')
                         time.sleep(1)
                     except:
                         self.log(f'ALUNO {aluno.nome} FORA DA PLANILHA')
                         print(aluno.linha)
+
+    def atividades_para_corrigir2(self, disciplina, notas_alunos):
+        self.log('OBTENDO AS ATIVIDADES PARA CORRIGIR (demora alguns segundos)')
+        for atividade in disciplina.ATIVIDADES:
+            if not atividade.precisa_avaliacao == '0' and 'Tarefa' in atividade.tipo:
+                self.log(f'ATIVIDADE {atividade.get_nome_curto()} POSSUI {atividade.precisa_avaliacao} ATIVIDADES PARA CORRIGIR')
+                alunos = self.aluno_que_n_fez_atividade(atividade)
+                for aluno in alunos:
+                    try:
+                        link_atividade = baseurl +'mod/assign/view.php?id='+atividade.id+'&rownum=0&action=grader&userid='+aluno.id
+                        if disciplina.is_tutoria_por_disciplina():
+                            nome_tutor = disciplina.tutor
+                        else:
+                            nome_tutor = aluno.get_tutor()
+                        txt = '=HYPERLINK("'+link_atividade+'";"'+nome_tutor+'")'
+                        notas = notas_alunos[aluno.nome]
+                        notas[disciplina.ATIVIDADES.index(atividade)]= txt
+                    except:
+                        self.log(f'ALUNO {aluno.nome} FORA DA PLANILHA')
+                        print(aluno.linha)
+        return notas_alunos
 
     def obter_notas_alunos(self, disciplina):
         self.log("OBTENDO NOTA DOS ALUNOS NO MOODLE")
