@@ -138,6 +138,7 @@ class Disciplina:
         self.professor = "nome professor"
         self.email_professor = "professor@email"
         self.ATIVIDADES = []
+        self.ALUNOS = []
 
 
     def is_tutoria_por_disciplina(self):
@@ -232,7 +233,7 @@ class Script:
                 notas_alunos = self.atividades_para_corrigir2(disciplina, notas_alunos)
                 self.atualiza_planilha(disciplina, notas_alunos)
                 # escreve_notas_alunos(disciplina, notas_alunos)
-                print()
+            print()
         self.log('FINALIZADO')
 
     def log(self, texto):
@@ -362,7 +363,6 @@ class Script:
             soup = bs(r.content, 'html5lib')
             soup.find('div', attrs={'class': 'course-content'}).find_all('div')
             self.log(f'ACESSO PERMITIDO NA DISCIPLINA {disciplina.codigo}')
-            print()
             return True
         except:
             self.log(f'ACESSO NÃO PERMITIDO NA DISCIPLINA {disciplina.codigo}')
