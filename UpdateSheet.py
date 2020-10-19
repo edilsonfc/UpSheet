@@ -765,21 +765,23 @@ class Script:
         self.log('OBTENDO ATIVIDADES DO CURSO NO MOODLE')
         r = self.session.get(disciplina.get_url_livro_notas())
         soup = bs(r.content, 'html5lib')
-
         tr = soup.find('tr', attrs={'class': 'heading'})
         ths = tr.find_all('th', attrs={'class': 'item'})
-
         atividades = []
         for th in ths:
-            dataitem = th['data-itemid']
-            a = th.find_all('a')[0]
-            link = a['href']
-            id = link[link.find('?id=')+4:]
-            tipo = a.find('img')['alt']
-            nome = a.contents[1]
-            # print(dataitem, tipo, id, link, nome)
-
-            atividades.append(Atividade(nome, id, tipo, link, dataitem))
+            try:
+                dataitem = th['data-itemid']
+                a = th.find_all('a')[0]
+                link = a['href']
+                id = link[link.find('?id=')+4:]
+                if id.find('&') > 0:
+                    id = id[0:id.find('&')]
+                tipo = a.find('img')['alt']
+                nome = a.contents[1]
+                #print(dataitem, tipo, id, link, nome)
+                atividades.append(Atividade(nome, id, tipo, link, dataitem))
+            except:
+                self.log('!ERRO ENCONTRADO UM ÍTEM NO LIVRO QUE NÃO É ATIVIDADE')
 
         for atividade in atividades:
             if 'Tarefa' in atividade.tipo:
