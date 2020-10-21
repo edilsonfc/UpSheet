@@ -20,6 +20,8 @@ KEY_MBA_III = '1mGRcIdVWR6OtppHgxCxFRrdGWH0Kn9IUN86wpHP_WGQ'
 KEY_MBA_IV = '15DxfzavHF6HRZzmA8Dcg0CiMnB6IvBZKWmfP5u7rJow'
 #REDES
 
+
+
 #PLANILHA PADRÃO
 KEYs = ''
 #KEYs = KEY_JAVA_XIX
@@ -117,7 +119,7 @@ PASSWORD = getpass.getpass("Senha do Moodle: ")
 os.system("cls" if os.name == "nt" else "clear")
 
 print()
-print(curso.upper(),turma.upper())
+print(curso.upper(), turma.upper())
 print()
 print('https://docs.google.com/spreadsheets/d/'+KEYs)
 print()
@@ -219,7 +221,7 @@ class Script:
 
     def iniciar(self):
         self.log('INICIANDO EXECUÇÃO')
-        numero = self.altualizar_alunos()
+        self.altualizar_alunos()
         # OBTER CONF
         # PARA CADA CADA PLANILHA
         print()
@@ -331,8 +333,6 @@ class Script:
         for a in range(len(alunos)):
             aluno = alunos[a]
 
-        # for aluno in alunos:
-        #     print('----'+aluno)
             if not (aluno == "" or aluno == "Nome" or a < nomes.row - 1):
                 # print("--" + aluno)
                 # al = Aluno(aluno, situação[alunos.index(aluno)], str(int(alunos.index(aluno)) + 1))
