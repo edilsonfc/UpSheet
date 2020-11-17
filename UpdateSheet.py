@@ -19,7 +19,8 @@ KEY_JAVA_XX = '1qE6i4r5oieIPbAUOcuAKEcfXp-Y93RRjuU4uqe7sMjk'
 KEY_MBA_III = '1mGRcIdVWR6OtppHgxCxFRrdGWH0Kn9IUN86wpHP_WGQ'
 KEY_MBA_IV = '15DxfzavHF6HRZzmA8Dcg0CiMnB6IvBZKWmfP5u7rJow'
 #REDES
-
+KEY_REDES_XII = '1qSWs4ym3oziMFySKUFj8bnBCcuLUp7R8xNcICuAyIjE'
+KEY_REDES_XIII = '1N3MXfD0NRPkEQVKn1bliJ3ypP9LYIKjr0l1mIZ0Qktw'
 
 
 #PLANILHA PADRÃO
@@ -45,7 +46,7 @@ else:
     print('Opções de curso:')
     print('- JAVA XVIII, Java XIX, java XX')
     print('- MBA III ou MBA IV')
-    print('- REDES em breve')
+    print('- REDES XII oi REDES XIII')
     print('----------------------------------------------')
     print()
     print('-------- CURSO _------------------------------')
@@ -56,8 +57,8 @@ else:
     print()
     print('-------- TURMA _------------------------------')
     print('JAVA: XVIII, XIX ou XX')
-    print('MBA: III, IV')
-    print('REDES: não disponível')
+    print('MBA: III ou IV')
+    print('REDES: XII ou XIII')
     print()
     turma = input('Digite a turma: ')
     print('----------------------------------------------')
@@ -83,9 +84,14 @@ if curso.upper() == 'MBA':
         time.sleep(5)
         sys.exit()
 if curso.upper() == 'REDES':
-    print('!NÃO IMPLEMENTADO')
-    time.sleep(5)
-    sys.exit()
+    if turma.upper() == 'XIII':
+        KEYs = KEY_REDES_XIII
+    if turma.upper() == 'XII':
+        KEYs = KEY_REDES_XII
+    if KEYs == '':
+        print('!TURMA INCORRETA')
+        time.sleep(5)
+        sys.exit()
 if KEYs == '':
     print('!CURSO INCORRETO')
     time.sleep(5)
@@ -236,6 +242,7 @@ class Script:
                 self.atualiza_planilha(disciplina, notas_alunos)
                 # escreve_notas_alunos(disciplina, notas_alunos)
             print()
+        print('https://docs.google.com/spreadsheets/d/'+KEYs)
         self.log('FINALIZADO')
 
     def log(self, texto):
@@ -766,6 +773,7 @@ class Script:
         r = self.session.get(disciplina.get_url_livro_notas())
         soup = bs(r.content, 'html5lib')
         tr = soup.find('tr', attrs={'class': 'heading'})
+        #print(tr)
         ths = tr.find_all('th', attrs={'class': 'item'})
         atividades = []
         for th in ths:
@@ -784,6 +792,7 @@ class Script:
                 self.log('!ERRO ENCONTRADO UM ÍTEM NO LIVRO QUE NÃO É ATIVIDADE')
 
         for atividade in atividades:
+            self.log(f'ATIVIDADE {atividade.nome} ENCONTRADA')
             if 'Tarefa' in atividade.tipo:
                 r = self.session.get(atividade.link)
                 time.sleep(1)
@@ -799,13 +808,73 @@ class Script:
                         atividade.precisa_avaliacao = td
                     if 'Data de entrega' in th:
                         atividade.data_entrega = td
+            if 'Questionário' in atividade.tipo:
+                r = self.session.get(atividade.link)
+                time.sleep(1)
+                soup = bs(r.content, 'html5lib')
+                try:
+                    cont = 0
+                    aa = soup.find_all('a', attrs={'title': 'Revisão de tentativa'})
+                    for a in aa:
+                        if 'Ainda não avaliado' in a:
+                            cont = cont+1
+                    atividade.precisa_avaliacao = cont
+                except:
+                    None
+
+                r = self.session.get(baseurl + '/course/modedit.php?update=' + atividade.id)
+                time.sleep(1)
+                soup = bs(r.content, 'html5lib')
+                #verifica se data está habilitado
+                hb = soup.find('input', attrs={'id': 'id_timeclose_enabled'})
+                if 'checked' in hb.attrs:
+                    dia = ''
+                    select = soup.find('select', attrs={'id':'id_timeclose_day'})
+                    opts = select.find_all('option')
+                    for opt in opts:
+                        if 'selected' in opt.attrs:
+                            dia = opt['value']
+
+                    mes = ''
+                    select = soup.find('select', attrs={'id': 'id_timeclose_month'})
+                    opts = select.find_all('option')
+                    for opt in opts:
+                        if 'selected' in opt.attrs:
+                            mes = opt['value']
+                    ano = ''
+                    select = soup.find('select', attrs={'id': 'id_timeclose_year'})
+                    opts = select.find_all('option')
+                    for opt in opts:
+                        if 'selected' in opt.attrs:
+                            ano = opt['value']
+                    hora = ''
+                    select = soup.find('select', attrs={'id': 'id_timeclose_hour'})
+                    opts = select.find_all('option')
+                    for opt in opts:
+                        if 'selected' in opt.attrs:
+                            hora = opt['value']
+                    minuto = ''
+                    select = soup.find('select', attrs={'id': 'id_timeclose_minute'})
+                    opts = select.find_all('option')
+                    for opt in opts:
+                        if 'selected' in opt.attrs:
+                            minuto = opt['value']
+
+                    atividade.data_entrega = f'{dia}/{mes}/{ano}, {hora}:{minuto}'
+
 
         disciplina.ATIVIDADES = atividades
         disciplina.num_atividades = len(disciplina.ATIVIDADES)
         return atividades
 
-    def aluno_que_n_fez_atividade(self, atividade):
-        # identificar qual aluno não fez a atividade
+    def aluno_com_atividade_para_corrigir(self, atividade):
+        if 'Tarefa' in atividade.tipo:
+            return self.aluno_com_tarefa_para_corrigir(atividade)
+        if 'Questionário' in atividade.tipo:
+            return self.aluno_com_questionario_para_corrigir(atividade)
+
+    def aluno_com_tarefa_para_corrigir(self, atividade):
+        # identificar qual aluno possui TAREFA para corrigir
         try:
             r = self.session.get(atividade.link + '&action=grading')
         except:
@@ -838,6 +907,48 @@ class Script:
                     alunos.append(self.obter_aluno_por_id(id_aluno[4:]))
         return alunos
 
+    def aluno_com_questionario_para_corrigir(self, atividade):
+        # identificar qual aluno possui QUESTIONÁRIO para corrigir
+        try:
+            r = self.session.get(atividade.link)
+        except:
+            self.session = self.login(USERNAME, PASSWORD)
+            r = self.session.get(atividade.link + '&action=grading')
+
+        time.sleep(1)
+        soup = bs(r.content, 'html5lib')
+        trs = None
+        try:
+            nma = soup.find('span', attrs={'class': 'gradedattempt'})
+            print(nma)
+            if 'Nota mais alta' in nma.contents[0]:
+                trs = soup.find_all('tr', attrs={'class': 'gradedattempt'})
+        except:
+            trs = soup.find_all('tr')
+
+        if trs == None:
+            trs = soup.find_all('tr')
+
+        alunos = []
+        for tr in trs:
+            if 'id' in tr.attrs and 'class' in tr.attrs:
+                if 'mod-quiz-report-overview-report_r' in tr['id'] and not 'emptyrow' in tr['class']:
+                    try:
+                        id = tr['id']
+                        td = tr.find('td', attrs={'id': id + '_c1'})
+                        a = td.find_all('a')[0]
+                        href = a['href']
+                        id_aluno = href[href.find('?id=')+4:href.find('&course=')]
+                        td = tr.find('td', attrs={'id': id + '_c4'})
+                        if 'Finalizada' in td.contents[0]:
+                            aa = tr.find_all('a', attrs={'title': 'Revisão de tentativa'})
+                            if 'Ainda não avaliado' in aa[0].contents:
+
+                                alunos.append(self.obter_aluno_por_id(id_aluno))
+                    except:
+                        print('!!ERRO')
+        return alunos
+
     def obter_aluno_por_id(self, id):
         for aluno in self.ALUNOS_MOODLE:
             if aluno.id == id:
@@ -868,22 +979,26 @@ class Script:
     def atividades_para_corrigir2(self, disciplina, notas_alunos):
         self.log('OBTENDO AS ATIVIDADES PARA CORRIGIR (demora alguns segundos)')
         for atividade in disciplina.ATIVIDADES:
-            if not atividade.precisa_avaliacao == '0' and 'Tarefa' in atividade.tipo:
-                self.log(f'ATIVIDADE {atividade.get_nome_curto()} POSSUI {atividade.precisa_avaliacao} ATIVIDADES PARA CORRIGIR')
-                alunos = self.aluno_que_n_fez_atividade(atividade)
-                for aluno in alunos:
-                    try:
-                        link_atividade = baseurl +'mod/assign/view.php?id='+atividade.id+'&rownum=0&action=grader&userid='+aluno.id
-                        if disciplina.is_tutoria_por_disciplina():
-                            nome_tutor = disciplina.tutor
-                        else:
-                            nome_tutor = aluno.get_tutor()
-                        txt = '=HYPERLINK("'+link_atividade+'";"'+nome_tutor+'")'
-                        notas = notas_alunos[aluno.nome]
-                        notas[disciplina.ATIVIDADES.index(atividade)]= txt
-                    except:
-                        self.log(f'ALUNO {aluno.nome} FORA DA PLANILHA')
-                        print(aluno.linha)
+            if not str(atividade.precisa_avaliacao) == '0':
+                if 'Tarefa' in atividade.tipo or 'Questionário' in atividade.tipo:
+                    self.log(f'ATIVIDADE {atividade.get_nome_curto()} POSSUI {atividade.precisa_avaliacao} ATIVIDADES PARA CORRIGIR')
+                    alunos = self.aluno_com_atividade_para_corrigir(atividade)
+                    for aluno in alunos:
+                        try:
+                            if 'Tarefa' in atividade.tipo:
+                                link_atividade = baseurl +'mod/assign/view.php?id='+atividade.id+'&rownum=0&action=grader&userid='+aluno.id
+                            if 'Questionário' in atividade.tipo:
+                                link_atividade = baseurl + 'mod/quiz/report.php?id=' + atividade.id + '&mode=overview'
+                            if disciplina.is_tutoria_por_disciplina():
+                                nome_tutor = disciplina.tutor
+                            else:
+                                nome_tutor = aluno.get_tutor()
+                            txt = '=HYPERLINK("'+link_atividade+'";"'+nome_tutor+'")'
+                            notas = notas_alunos[aluno.nome]
+                            notas[disciplina.ATIVIDADES.index(atividade)]= txt
+                        except:
+                            self.log(f'ALUNO {aluno.nome} FORA DA PLANILHA')
+                            print(aluno.linha)
         return notas_alunos
 
     def obter_notas_alunos(self, disciplina):
