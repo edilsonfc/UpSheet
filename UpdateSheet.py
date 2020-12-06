@@ -507,6 +507,22 @@ class Script:
         self.log('GRAVANDO NA PLANILHA O NOME DOS ALUNOS')
 
         intervalo = self.get_intervalo(False, self.linha_primeiro_aluno, 1, len(self.ALUNOS_MOODLE))
+
+        #
+        # print()
+        # print(self.linha_primeiro_aluno)
+        # print(len(self.ALUNOS_MOODLE))
+        # print()
+        #
+        # print(intervalo)
+        # print()
+        #
+        #
+        # for aluno in self.ALUNOS_MOODLE:
+        #     print(self.ALUNOS_MOODLE.index(aluno), aluno.nome)
+
+
+
         cell_list = planilha.range(intervalo)
         linha = 4
         for cell in cell_list:
@@ -613,8 +629,8 @@ class Script:
         for aluno in self.ALUNOS_MOODLE:
             if not aluno.situacao:
                 cell = planilha.find(aluno.nome_planilha)
-                # intervalo = self.get_intervalo(True, cell.row, cell.col, disciplina.num_atividades + 5)
-                intervalo = self.get_intervalo(True, int(aluno.linha) + 4, 1, disciplina.num_atividades + 5)
+                intervalo = self.get_intervalo(True, cell.row, cell.col, disciplina.num_atividades + 5)
+                #intervalo = self.get_intervalo(True, int(aluno.linha) + 4, 1, disciplina.num_atividades + 5)
                 planilha.format(intervalo, {
                     "backgroundColor": {
                         "red": 0.9,
@@ -710,6 +726,9 @@ class Script:
 
     def get_intervalo(self, horizontal, celInicio, colInicio, qntd):
         letras = list(string.ascii_uppercase);
+        letras2 = list(string.ascii_uppercase);
+        for l in letras2:
+            letras.append('A'+l)
         if horizontal:
             return letras[colInicio - 1]+str(celInicio)+':'+letras[colInicio+qntd-1]+str(celInicio)
         else:
@@ -946,7 +965,7 @@ class Script:
 
                                 alunos.append(self.obter_aluno_por_id(id_aluno))
                     except:
-                        print('!!ERRO')
+                        pass
         return alunos
 
     def obter_aluno_por_id(self, id):
