@@ -224,6 +224,7 @@ class Script:
         self.DISCIPLINAS = self.obter_disciplinas_ativas()
         self.linha_primeiro_aluno = 8
         self.linha_ultimo_aluno = self.linha_primeiro_aluno + len(self.ALUNOS_MOODLE) -1
+        self.BACKUP_ANOTACOES = {}
 
     def iniciar(self):
         self.log('INICIANDO EXECUÇÃO')
@@ -451,10 +452,12 @@ class Script:
     def get_planilha(self, disciplina: Disciplina):
         self.log('OBTENDO A PLANILHA DO CURSO '+disciplina.codigo)
         cell = wks.worksheet("CONF").find(disciplina.codigo)
+        self.criar_backup_anotacoes(disciplina)
         recriar = wks.worksheet('CONF').cell(cell.row,6).value
         if 'TRUE' in recriar:
             try:
                 self.log('PLANILHA DEVERÁ SER RECRIADA')
+                # self.criar_backup_anotacoes(disciplina)
                 wks.del_worksheet(wks.worksheet(disciplina.nome_planilha))
                 self.log('PLANILHA DELETADA')
             except:
@@ -502,6 +505,7 @@ class Script:
                 "bold": False
             }
         })
+
 
     def grava_nomes_alunos_planilha(self, disciplina, planilha):
         self.log('GRAVANDO NA PLANILHA O NOME DOS ALUNOS')
@@ -622,6 +626,78 @@ class Script:
             ]
         }
         wks.batch_update(body)
+
+
+
+
+        #self.restaurar_backup_anotacoes(planilha)
+
+
+
+
+
+    def criar_backup_anotacoes(self, disciplina):
+        self.log('CRIANO BACKUP DA PLANILHA')
+        self.BACKUP_ANOTACOES = {}
+        try:
+            planilha = wks.worksheet(disciplina.nome_planilha)
+        except:
+            print('planilha não localizada')
+
+        try:
+            cell_ANOTAR = planilha.find("ANOTAR SITUAÇÃO DO ALUNO")
+            cells_ANOTAR = planilha.col_values(cell_ANOTAR.col, value_render_option='FORMULA')
+            # cells_ANOTAR = planilha.col_values(cell_ANOTAR.col)
+            cells_ATIVIDADE = planilha.col_values(cell_ANOTAR.col - 5, value_render_option='FORMULA')
+            cells_PROVA = planilha.col_values(cell_ANOTAR.col - 4, value_render_option='FORMULA')
+            cells_2CHAMADA = planilha.col_values(cell_ANOTAR.col - 3, value_render_option='FORMULA')
+            cells_RECUP = planilha.col_values(cell_ANOTAR.col - 2, value_render_option='FORMULA')
+            cells_NOTA_FINAL = planilha.col_values(cell_ANOTAR.col - 1, value_render_option='FORMULA')
+            cells_DATA_CONTATO = planilha.col_values(cell_ANOTAR.col + 1, value_render_option='FORMULA')
+            for al in self.ALUNOS_MOODLE:
+                if str(al.linha) != '0':
+                    linha = int(al.linha) + 3
+                    ativ = ''
+                    if len(cells_ATIVIDADE) > linha:
+                        ativi = cells_ATIVIDADE[linha]
+                    prov = ''
+                    if len(cells_PROVA) > linha:
+                        prov = cells_PROVA[linha]
+                    seg_cham = ''
+                    if len(cells_2CHAMADA) > linha:
+                        seg_cham = cells_2CHAMADA[linha]
+                    rec = ''
+                    if len(cells_RECUP) > linha:
+                        rec = cells_RECUP[linha]
+                    nf = ''
+                    if len(cells_NOTA_FINAL) > linha:
+                        nf = cells_NOTA_FINAL[linha]
+                    dc = ''
+                    if len(cells_DATA_CONTATO) > linha:
+                        dc = cells_DATA_CONTATO[linha]
+                    anot = ''
+                    if len(cells_ANOTAR) > linha:
+                        anot = cells_ANOTAR[linha]
+                    self.BACKUP_ANOTACOES[al.nome_planilha] = [ativ, prov, seg_cham, rec, nf, anot, dc]
+
+        except:
+            print('ERRO AO CRIAR BACKUP')
+
+    def restaurar_backup_anotacoes(self, planilha):
+        self.log("RESTAURANDO BACKUP")
+        if len(self.BACKUP_ANOTACOES) > 0:
+            TABELA = []
+            for aluno in self.ALUNOS_MOODLE:
+                try:
+                    TABELA.append(self.BACKUP_ANOTACOES[aluno.nome_planilha])
+                except:
+                    TABELA.append(['','','','','','',''])
+            try:
+                cell = planilha.find('ANOTAR SITUAÇÃO DO ALUNO')
+                intervalo = self.get_intervalo_tabela(TABELA,cell.row+3, cell.col-5)
+                planilha.update(intervalo, TABELA, value_input_option='USER_ENTERED')
+            except:
+                pass
 
     def barrar_alunos_inativos(self, disciplina, planilha):
         self.log('BARRAR ALUNOS INATIVOS')
