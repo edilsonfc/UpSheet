@@ -15,12 +15,14 @@ import logging
 KEY_JAVA_XVIII = '1qvlHVHBPZEAtquBi8Gh1Wnc82-C-kAButZ8bmqihT-k'
 KEY_JAVA_XIX = '1Fkvo3rhYFfbuL712rHyyaA3XWhkkX4_YctDSK4_BIlc'
 KEY_JAVA_XX = '1qE6i4r5oieIPbAUOcuAKEcfXp-Y93RRjuU4uqe7sMjk'
+KEY_JAVA_XXI = '1tXlYhCy0_sjQzlHoCHWhUrAOkP8OJy4iB9JqQT1a6V8'
 #MBA
 KEY_MBA_III = '1mGRcIdVWR6OtppHgxCxFRrdGWH0Kn9IUN86wpHP_WGQ'
 KEY_MBA_IV = '15DxfzavHF6HRZzmA8Dcg0CiMnB6IvBZKWmfP5u7rJow'
 #REDES
 KEY_REDES_XII = '1qSWs4ym3oziMFySKUFj8bnBCcuLUp7R8xNcICuAyIjE'
 KEY_REDES_XIII = '1N3MXfD0NRPkEQVKn1bliJ3ypP9LYIKjr0l1mIZ0Qktw'
+KEY_REDES_XIV= '12e3TW3x26OCHIxP1axd5H9bCdbbLzw366Q3Boy64nRE'
 
 
 #PLANILHA PADRÃO
@@ -44,9 +46,9 @@ else:
     print()
     print('-------- CURSOS ------------------------------')
     print('Opções de curso:')
-    print('- JAVA XVIII, Java XIX, java XX')
+    print('- Java XIX, java XX, java XXI')
     print('- MBA III ou MBA IV')
-    print('- REDES XII oi REDES XIII')
+    print('- REDES XII, REDES XIII, REDES XIV')
     print('----------------------------------------------')
     print()
     print('-------- CURSO _------------------------------')
@@ -70,6 +72,8 @@ if curso.upper() == 'JAVA':
         KEYs = KEY_JAVA_XIX
     if turma.upper() == 'XX':
         KEYs = KEY_JAVA_XX
+    if turma.upper() == 'XXI':
+        KEYs = KEY_JAVA_XXI
     if KEYs == '':
         print('!TURMA INCORRETA')
         time.sleep(5)
@@ -84,6 +88,8 @@ if curso.upper() == 'MBA':
         time.sleep(5)
         sys.exit()
 if curso.upper() == 'REDES':
+    if turma.upper() == 'XIV':
+        KEYs = KEY_REDES_XIV
     if turma.upper() == 'XIII':
         KEYs = KEY_REDES_XIII
     if turma.upper() == 'XII':
@@ -626,10 +632,6 @@ class Script:
             ]
         }
         wks.batch_update(body)
-
-
-
-
         #self.restaurar_backup_anotacoes(planilha)
 
 
@@ -840,6 +842,8 @@ class Script:
             if not 'id' in linha.attrs:
                 continue
             cells = linha.find_all('td')
+            cells2 = linha.find_all('th')
+            cells = cells + cells2
             id = ''
             nome = ''
             email = ''
